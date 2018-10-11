@@ -1,0 +1,89 @@
+\documentclass[runningheads,a4paper]{llncs}
+
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+
+\begin{document}
+
+\mainmatter  % start of an individual contribution
+
+% first the title is needed
+\title{Sondeo del estado del arte en TCP Incast}
+
+\author{Julián Bayardo}
+
+\institute{Universidad de Buenos Aires\\
+\url{julian@bayardo.info}}
+
+\maketitle
+
+
+% \begin{abstract}
+% The abstract should summarize the contents of the paper and should
+% contain at least 70 and at most 150 words. It should be written using the
+% \emph{abstract} environment.
+% \keywords{We would like to encourage you to list your keywords within
+% the abstract section}
+% \end{abstract}
+
+\section{Introducción}
+
+Una de las claves del desarrollo de Internet en los últimos años ha sido lograr escalar la infraestructura para soportar los millones de usuarios nuevos y sus dispositivos. Desde el punto de vista de los proveedores de servicios, los data centers son el caballo de batalla que les ha permitido adaptarse.
+
+Aunque no hay una definición estandarizada de qué es un data center, el consenso es que el término hace referencia a una red de servidores con ciertas garantías de tolerancia a fallas (tanto en storage como en la red), escalabilidad horizontal, y uniformidad en sus capacidades de procesamiento y transferencia de datos; todo esto se traduce directamente a una multitud de garantías sobre la infraestructura.
+
+Cada vez se están construyendo más data centers, y para usos que varían desde el análisis y procesamiento de datos a servidores web, mensajería instantanea, entre otros. La planificación y diseño de un data center es un problema con múltiples aristas e interacciones muy complejas; las decisiones tomadas en ese plano determinan fuertemente qué tipo de aplicaciones podrán llevarse a cabo.
+
+En concreto, los data centers generan un microecosistema muy particular en tanto a la topología de la red y sus patrones de comunicación. El mismo es ampliamente diferente a lo que sucede en el resto de la Internet. Aun así, los data centers utilizan el mismo stack de protocolos que el resto de la Internet, que opera bajo condiciones ampliamente diferentes. 
+
+El hecho de que se utilicen los mismos protocolos que fueron inventados en los 70s es un testimonio a su excelente diseño y flexibilidad. Sin embargo, la experiencia práctica ha demostrado que esta diferencia sustancial en el entorno se traduce en problemas de performance. Es por esto que los últimos años han visto una gran cantidad de investigación en torno a cómo adaptar el stack para funcionar mejor en data centers.
+
+Desde el punto de vista de las características de la red de comunicación, hay ciertos patrones que se repiten \cite{Benson_Network_2010}:
+
+\begin{itemize}
+\item Topología en forma de árbol con múltiples raíces, y regular en el número de conexiones con los sub-árboles.
+
+\item Los switches y routers que se utilizan son baratos y fáciles de conseguir, implicando en particular que tienen buffers pequeños.
+
+\item Las conexiones suelen ser de muchos hacia uno, de banda ancha, y baja latencia.
+\end{itemize}
+
+Este trabajo tiene tres objetivos: discutir los problemas que se presentan al utilizar TCP en las redes de los data centers, 
+
+Siguiendo estos lineamientos, la idea de este trabajo es poner el foco en la utilización de TCP en los data centers, y en particular sobre el problema de TCP Incast que se genera en este caso. Haremos un relevamiento del problema, posibles formas de resolverlo, y la experiencia práctica que se tiene con las mismas.
+
+El resto de este artículo se estructura de la siguiente forma: en la Secc. \ref{problems} introduciremos los problemas observados en las data center networks (DCNs). Luego, pondremos el foco exclusivamente en TCP Incast para explicar sus causas en la Secc. \ref{causes}, los modelos formales que se han realizado al respecto en la Secc. \ref{models}, y un análisis de las distintas formas de mitigar el problema en la Secc. \ref{solutions}. Finalmente, concluimos en la Secc. \ref{conclusion}. 
+
+\section{Problemas de TCP en Data Center Networks} \label{problems}
+
+\subsection{TCP Incast}
+
+\subsection{TCP Outcast}
+
+\subsection{Latencia}
+
+\section{Causas} \label{causes}
+
+\section{Modelos Formales} \label{models}
+
+\section{Soluciones} \label{solutions}
+
+\subsection{Cambio de Parámetros}
+
+\subsection{Algoritmia para Control de Congestión}
+
+\subsection{Protocolos Específicos}
+
+\section{Conclusión} \label{conclusion}
+
+\bibliographystyle{plain}
+\bibliography{readcube_export}{}
+
+\end{document}
