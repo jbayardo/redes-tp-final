@@ -1,15 +1,26 @@
 \documentclass[runningheads,a4paper]{llncs}
 
+% Necesarios para la tabla del final
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{longtable}
 \usepackage{lscape}
 \usepackage{geometry}
+
+
+% Necesarios para algo de matemática que hay por ahí
 \usepackage{amsmath}
 \usepackage{amssymb}
+
+% Necesario para imágenes
+\usepackage{graphicx}
+
+% Necesario para URLs
+\usepackage{url}
+
+% Configuración del índice
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{4}
-\usepackage{graphicx}
-\usepackage{url}
 
 % Configuración de UTF-8 para poder escribir en Español
 \usepackage[utf8]{inputenc}
@@ -94,6 +105,8 @@ En concreto, los \textit{data centers} tienen condiciones operativas ampliamente
 Siguiendo estos lineamientos, este trabajo tiene como objetivo poner el foco en la utilización de TCP en los \textit{data centers}, y en particular sobre el problema de TCP Incast que se genera utilizando MapReduce. Haremos un relevamiento de la literatura en torno a las posibles formas de evitarlo, y la experiencia práctica que se tiene con las mismas.
 
 El resto de este trabajo se estructura de la siguiente forma: en la Secc. \ref{problems} introduciremos algunos de los problemas observados en las \textit{data center networks} (DCNs) y sus causas. Luego, pondremos el foco exclusivamente en TCP Incast para realizar un análisis de las distintas formas de mitigar el problema en la Secc. \ref{solutions}. Finalmente, concluimos en la Secc. \ref{conclusion}. 
+
+\newpage
 
 \section{Problemas de TCP en Data Center Networks} \label{problems}
 
@@ -189,6 +202,8 @@ Cuando un puerto de un \textit{switch} está afectado por Port Blackout, las con
 Los paquetes descartados por el \textit{blackout} pueden tener un efecto catastrófico, dependiendo de la cantidad de conexiones entrantes en el puerto que lo sufre. Si hay una única conexión, la misma percibirá una ráfaga de \textit{timeouts} que generaran la caida de la ventana de congestión y, por ende, del \textit{throughput}. En un caso con múltiples conexiones entrantes, la pérdida de paquetes se distribuye entre ellas, generando un efecto más leve.
 
 En resumen, TCP Outcast es un problema que nace con la generación de Port Blackout en la capa de enlace, asimismo generado por un conjunto de condiciones causadas por la capa de aplicación y es, al igual que Incast, empeorado por los mecanismos de control de congestión de TCP, en la capa de transporte.
+
+\newpage
 
 \section{Soluciones} \label{solutions}
 
@@ -542,10 +557,22 @@ Este esquema tiene el beneficio de ser extremadamente simple, de bajo costo, y r
 
 % TODO: Named Data Networking http://sci-hub.tw/https://dl.acm.org/citation.cfm?doid=3226052.3226055
 % TODO: + NDN https://dl.acm.org/citation.cfm?id=3226055
-\section{Conclusión} \label{conclusion}
 
-% TODO: Survey https://dl.acm.org/citation.cfm?id=2884661
-% TODO: Survey https://dl.acm.org/citation.cfm?id=2854809
+\newpage
+
+\section{Seguridad}
+
+Tal vez una de las menciones más notoriamente ausente en la literatura de Incast hasta ahora citada en este trabajo, es cómo afecta Incast a la seguridad en los \textit{data centers}. Este tema no ha sido muy estudiado de por sí, y hay muy poco trabajo publicado.
+
+\citet{}
+
+\newpage
+
+\section{Ruteo}
+
+\newpage
+
+\section{Conclusión} \label{conclusion}
 
 Los \textit{data centers} se han convertido en una pieza de infraestructura clave para diversas aplicaciones en la nube, y para el guardado de vastas cantidades de datos.
 
@@ -553,43 +580,100 @@ Para lograr que los sean costo efectivos, utilizan las mismas tecnologías que e
 
 TCP Incast es uno de los principales causantes de problemas de \textit{throughput} en estos casos, y de ahí su relevancia como problema de investigación. Es un problema en sí muy rico en su complejidad, y difícil de resolver: al día de hoy continúan produciéndose artículos de investigación al respecto, mostrando claramente que está lejos de ser un problema resuelto.
 
-En este trabajo realizamos un paneo de la literatura sobre TCP Incast en los últimos años; además, resumimos múltiples formas de atacar al problema, desde las capas de Aplicación, Transporte, y Enlace, mostrando una amplia variedad de soluciones con distintas complejidades de implementación y resultados prácticos. En la tabla de la próxima hoja puede verse un resumen de las técnicas exploradas en este trabajo.
+En este trabajo realizamos un paneo de la literatura sobre TCP Incast en los últimos años; además, resumimos múltiples formas de atacar al problema, desde las capas de Aplicación, Transporte, y Enlace, mostrando una amplia variedad de soluciones con distintas complejidades de implementación y resultados prácticos.
+
+Se prepararon varias tablas para resumir los resultados de este trabajo. En la tabla \ref{table:layer-classification} puede verse una división por las capas del modelo OSI de cada una de las soluciones presentadas. Cabe destacar que en muchos casos las técnicas no están enteramente contenidas dentro de una capa (por ejemplo, DCTCP requiere cambios en la capa de transporte, y cambios en la capa de enlace); esta clasificación es por lo tanto ambigua, y a criterio del autor. En las tablas \ref{table:technical-feasibility} y \ref{table:technical-cost}, presentamos un breve juicio de factibilidad técnica y posible costo implementativo de cada una de las propuestas, con un criterio similar al utilizado en \cite{Ren_A_2014}.
 
 \newpage
 
-\newgeometry{left=3cm,bottom=0.5cm, top=0.5cm,right=3cm}
+\section{Apéndice}
 
-% Please add the following required packages to your document preamble:
-% \usepackage{multirow}
-% \usepackage{lscape}
-\begin{landscape}
 \begin{table}[]
 \centering
-\begin{tabular}{|c|c|l|l|l|}
-\hline
-\textbf{Capa}                                     & \textbf{Tipo}                                              & \multicolumn{1}{c|}{\textbf{Propuesta}} & \multicolumn{1}{c|}{\textbf{Factibilidad Técnica}}                      & \multicolumn{1}{c|}{\textbf{Costo Implementativo}}                \\ \hline
-\multicolumn{1}{|l|}{\multirow{4}{*}{Aplicación}} & \multicolumn{1}{l|}{\multirow{4}{*}{Cambio de Aplicación}} & Aumentar SRU                            & \multirow{2}{*}{Problemas de presión de memoria, fairness. y latencia.} & Bajo. Cambio de un parámetro.                                     \\ \cline{3-3} \cline{5-5} 
-\multicolumn{1}{|l|}{}                            & \multicolumn{1}{l|}{}                                      & Aumentar Block Size                     &                                                                         & Bajo. Cambio de un parámetro.                                     \\ \cline{3-5} 
-\multicolumn{1}{|l|}{}                            & \multicolumn{1}{l|}{}                                      & Application-Level Scheduling            & Complejo de implementar;                                                & Alto. Requiere planeamiento de la aplicación y cambios de kernel. \\ \cline{3-3} \cline{5-5} 
-\multicolumn{1}{|l|}{}                            & \multicolumn{1}{l|}{}                                      & Global Scheduling                       & puede lograr alcanzar el goodput óptimo.                                & Alto. Require planeamiento de la aplicación.                      \\ \hline
-\multirow{9}{*}{Transporte}                       & \multirow{4}{*}{Cambio de Parámetros}                      & Menor RTO Timer                         & Logran aminorar el efecto de Incast;                                    & Bajo a Alto. Depende del valor deseado.                           \\ \cline{3-3} \cline{5-5} 
-                                                  &                                                            & Desactivar Delayed ACK                  & es claro que no son soluciones ideales.                                 & Bajo. Cambio de un parámetro.                                     \\ \cline{3-3} \cline{5-5} 
-                                                  &                                                            & Eliminar Exponential Backoff            & Poca investigación sobre cómo estos                                     & Alto. Requiere actualizar código de fuente.                       \\ \cline{3-3} \cline{5-5} 
-                                                  &                                                            & Menor MTU                               & cambios afectan interacciones con Internet.                             & Bajo a Alto. Depende de la técnica.                               \\ \cline{2-5} 
-                                                  & \multirow{2}{*}{Control de Congestión}                     & Retransmisión Probabilistica            & Simulaciones con buenos resultados. Sin reportes de uso.                & Alto. Requiere actualizar código de fuente.                       \\ \cline{3-5} 
-                                                  &                                                            & Session-Aware Cong. Control             & Simulaciones con buenos resultados. Sin reportes de uso.                & Alto. Requiere actualizar código de fuente.                       \\ \cline{2-5} 
-                                                  & \multirow{3}{*}{Protocolos Específicos}                    & DCTCP                                   & Utilizado ampliamente en la práctica.                                   & Intermedio. Requiere deploy en switches.                          \\ \cline{3-5} 
-                                                  &                                                            & ICTCP                                   & Simulaciones con buenos resultados. Sin reportes de uso.                & Alto. Requiere actualizar código de fuente.                       \\ \cline{3-5} 
-                                                  &                                                            & GIP                                     & Simulaciones con buenos resultados. Sin reportes de uso.                & Alto. Requiere actualizar código de fuente.                       \\ \hline
-\multirow{4}{*}{Enlace}                           & Cambio de Hardware                                         & Aumento de Buffer Size                  & Inviable. Costo muy alto.                                               & Muy Alto. Cambio de infraestructura crítica.                      \\ \cline{2-5} 
-                                                  & Control de Congestión                                      & Fair Quantized Congestion Notification  & Simulaciones con buenos resultados. Sin reportes de uso.                & Muy Alto. Requiere hardware compatible.                           \\ \cline{2-5} 
-                                                  & Control de Flujo                                           & Ethernet Flow Control                   & Buenos resultados en el escenario simple, malos en el real.             & Bajo. Cambio de un parámetro.                                     \\ \cline{2-5} 
-                                                  & Cambio de Encolamiento                                     & Hashed Credits Fair                     & Simulaciones con buenos resultados. Sin implementaciones.               & Muy Alto. Cambio de infraestructura crítica.                      \\ \hline
-\end{tabular}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}ccl@{}}
+\toprule
+\textbf{Capa}               & \textbf{Tipo}                           & \multicolumn{1}{c}{\textbf{Propuesta}} \\ \midrule
+\multirow{4}{*}{Aplicación} & \multirow{4}{*}{Cambio de Aplicación}   & Aumentar SRU \cite{Phanishayee_Throughput_2008} \cite{Ke_SchedulingDataRequests_2012}                           \\ \cmidrule(l){3-3} 
+                            &                                         & Aumentar Block Size \cite{Krevat_ApplicationLevelApproaches_2007} \cite{Zheng_BlockSizeExp_2011} \cite{Chen_BlockSizeExpV2_2012}                    \\ \cmidrule(l){3-3} 
+                            &                                         & Application-Level Scheduling \cite{Podlesny_ApplicationLevelScheduling_2012}           \\ \cmidrule(l){3-3} 
+                            &                                         & Global Scheduling \cite{Krevat_ApplicationLevelApproaches_2007}                      \\ \midrule
+\multirow{9}{*}{Transporte} & \multirow{4}{*}{Cambio de Parámetros}   & Menor RTO Timer \cite{Phanishayee_Throughput_2008} \cite{Chen_Understanding_2009} \cite{Vasudevan_FineGradinedRetrans_2009} \cite{Ke_SchedulingDataRequests_2012} \cite{Chen_Comprehensive_2015} \cite{Osada_RTO_2017}                        \\ \cmidrule(l){3-3} 
+                            &                                         & Desactivar Delayed ACK \cite{Phanishayee_Throughput_2008} \cite{Vasudevan_FineGradinedRetrans_2009}                 \\ \cmidrule(l){3-3} 
+                            &                                         & Eliminar Exponential Backoff \cite{Zheng_ExpBackoff_2011}           \\ \cmidrule(l){3-3} 
+                            &                                         & Menor MTU \cite{Zhang_MTU_2011} \cite{Huang_MTUVarV1_2015} \cite{Huang_MTUVar_2018}                              \\ \cmidrule(l){2-3} 
+                            & \multirow{2}{*}{Control de Congestión}  & Retransmisión Probabilistica \cite{Kulkarni_Probabilistic_2011}           \\ \cmidrule(l){3-3} 
+                            &                                         & Session-Aware Cong. Control \cite{Li_SACC_2016}            \\ \cmidrule(l){2-3} 
+                            & \multirow{3}{*}{Protocolos Específicos} & DCTCP \cite{Alizadeh_DCTCP_2010}                                  \\ \cmidrule(l){3-3} 
+                            &                                         & ICTCP \cite{Wu_ICTCP_2010}                                  \\ \cmidrule(l){3-3} 
+                            &                                         & GIP \cite{Zhang_GIP_2013}                                    \\ \midrule
+\multirow{4}{*}{Enlace}     & Cambio de Hardware                      & Aumento de Buffer Size \cite{Phanishayee_Throughput_2008} \cite{Kulkarni_Probabilistic_2011}                 \\ \cmidrule(l){2-3} 
+                            & Control de Congestión                   & Fair Quantized Congestion Notification \cite{Zhang_QCN_2011} \\ \cmidrule(l){2-3} 
+                            & Control de Flujo                        & Ethernet Flow Control \cite{Phanishayee_Throughput_2008}                  \\ \cmidrule(l){2-3} 
+                            & Cambio de Encolamiento                  & Hashed Credits Fair \cite{Shpiner_HCF_2010}                    \\ \bottomrule
+\end{tabular}%
+}
+\caption{Las posibles formas de tratar con TCP Incast, desagregadas por capa del modelo OSI y tipo de cambios requeridos.}
+\label{table:layer-classification}
 \end{table}
-\end{landscape}
 
-\restoregeometry
+\begin{table}[]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}ll@{}}
+\toprule
+\multicolumn{1}{c}{\textbf{Propuesta}} & \multicolumn{1}{c}{\textbf{Factibilidad Técnica}}                       \\ \midrule
+Aumentar SRU \cite{Phanishayee_Throughput_2008} \cite{Ke_SchedulingDataRequests_2012}                           & \multirow{2}{*}{Problemas de presión de memoria, fairness. y latencia.} \\ \cmidrule(r){1-1}
+Aumentar Block Size \cite{Krevat_ApplicationLevelApproaches_2007} \cite{Zheng_BlockSizeExp_2011} \cite{Chen_BlockSizeExpV2_2012}                    &                                                                         \\ \midrule
+Application-Level Scheduling \cite{Podlesny_ApplicationLevelScheduling_2012}           & Complejo de implementar;                                                \\ \cmidrule(r){1-1}
+Global Scheduling \cite{Krevat_ApplicationLevelApproaches_2007}                      & puede lograr alcanzar el goodput óptimo.                                \\ \midrule
+Menor RTO Timer \cite{Phanishayee_Throughput_2008} \cite{Chen_Understanding_2009} \cite{Vasudevan_FineGradinedRetrans_2009} \cite{Ke_SchedulingDataRequests_2012} \cite{Chen_Comprehensive_2015} \cite{Osada_RTO_2017}                        & Logran aminorar el efecto de Incast;                                    \\ \cmidrule(r){1-1}
+Desactivar Delayed ACK \cite{Phanishayee_Throughput_2008} \cite{Vasudevan_FineGradinedRetrans_2009}                 & es claro que no son soluciones ideales.                                 \\ \cmidrule(r){1-1}
+Eliminar Exponential Backoff \cite{Zheng_ExpBackoff_2011}           & Poca investigación sobre cómo estos                                     \\ \cmidrule(r){1-1}
+Menor MTU \cite{Zhang_MTU_2011} \cite{Huang_MTUVarV1_2015} \cite{Huang_MTUVar_2018}                              & cambios afectan interacciones con Internet.                             \\ \midrule
+Retransmisión Probabilistica \cite{Kulkarni_Probabilistic_2011}           & Simulaciones con buenos resultados. Sin reportes de uso.                \\ \midrule
+Session-Aware Cong. Control \cite{Li_SACC_2016}            & Simulaciones con buenos resultados. Sin reportes de uso.                \\ \midrule
+DCTCP \cite{Alizadeh_DCTCP_2010}                                  & Utilizado ampliamente en la práctica.                                   \\ \midrule
+ICTCP \cite{Wu_ICTCP_2010}                                  & Simulaciones con buenos resultados. Sin reportes de uso.                \\ \midrule
+GIP \cite{Zhang_GIP_2013}                                    & Simulaciones con buenos resultados. Sin reportes de uso.                \\ \midrule
+Aumento de Buffer Size \cite{Phanishayee_Throughput_2008} \cite{Kulkarni_Probabilistic_2011}                 & Inviable. Costo muy alto.                                               \\ \midrule
+Fair Quantized Congestion Notification \cite{Zhang_QCN_2011} & Simulaciones con buenos resultados. Sin reportes de uso.                \\ \midrule
+Ethernet Flow Control \cite{Phanishayee_Throughput_2008}                  & Buenos resultados en el escenario simple, malos en el real.             \\ \midrule
+Hashed Credits Fair \cite{Shpiner_HCF_2010}                    & Simulaciones con buenos resultados. Sin implementaciones.               \\ \bottomrule
+\end{tabular}%
+}
+\caption{Breve análisis de factibilidad implementativa.}
+\label{table:technical-feasibility}
+\end{table}
+
+\begin{table}[]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}ll@{}}
+\toprule
+\multicolumn{1}{c}{\textbf{Propuesta}} & \multicolumn{1}{c}{\textbf{Costo Implementativo}}                 \\ \midrule
+Aumentar SRU \cite{Phanishayee_Throughput_2008} \cite{Ke_SchedulingDataRequests_2012}                           & Bajo. Cambio de un parámetro.                                     \\ \midrule
+Aumentar Block Size \cite{Krevat_ApplicationLevelApproaches_2007} \cite{Zheng_BlockSizeExp_2011} \cite{Chen_BlockSizeExpV2_2012}                    & Bajo. Cambio de un parámetro.                                     \\ \midrule
+Application-Level Scheduling \cite{Podlesny_ApplicationLevelScheduling_2012}           & Alto. Requiere planeamiento de la aplicación y cambios de kernel. \\ \midrule
+Global Scheduling \cite{Krevat_ApplicationLevelApproaches_2007}                      & Alto. Require planeamiento de la aplicación.                      \\ \midrule
+Menor RTO Timer \cite{Phanishayee_Throughput_2008} \cite{Chen_Understanding_2009} \cite{Vasudevan_FineGradinedRetrans_2009} \cite{Ke_SchedulingDataRequests_2012} \cite{Chen_Comprehensive_2015} \cite{Osada_RTO_2017}                        & Bajo a Alto. Depende del valor deseado.                           \\ \midrule
+Desactivar Delayed ACK \cite{Phanishayee_Throughput_2008} \cite{Vasudevan_FineGradinedRetrans_2009}                 & Bajo. Cambio de un parámetro.                                     \\ \midrule
+Eliminar Exponential Backoff \cite{Zheng_ExpBackoff_2011}           & Alto. Requiere actualizar código de fuente.                       \\ \midrule
+Menor MTU \cite{Zhang_MTU_2011} \cite{Huang_MTUVarV1_2015} \cite{Huang_MTUVar_2018}                              & Bajo a Alto. Depende de la técnica.                               \\ \midrule
+Retransmisión Probabilistica \cite{Kulkarni_Probabilistic_2011}           & Alto. Requiere actualizar código de fuente.                       \\ \midrule
+Session-Aware Cong. Control \cite{Li_SACC_2016}            & Alto. Requiere actualizar código de fuente.                       \\ \midrule
+DCTCP \cite{Alizadeh_DCTCP_2010}                                  & Intermedio. Requiere deploy en switches.                          \\ \midrule
+ICTCP \cite{Wu_ICTCP_2010}                                  & Alto. Requiere actualizar código de fuente.                       \\ \midrule
+GIP \cite{Zhang_GIP_2013}                                    & Alto. Requiere actualizar código de fuente.                       \\ \midrule
+Aumento de Buffer Size \cite{Phanishayee_Throughput_2008} \cite{Kulkarni_Probabilistic_2011}                 & Muy Alto. Cambio de infraestructura crítica.                      \\ \midrule
+Fair Quantized Congestion Notification \cite{Zhang_QCN_2011} & Muy Alto. Requiere hardware compatible.                           \\ \midrule
+Ethernet Flow Control \cite{Phanishayee_Throughput_2008}                  & Bajo. Cambio de un parámetro.                                     \\ \midrule
+Hashed Credits Fair \cite{Shpiner_HCF_2010}                    & Muy Alto. Cambio de infraestructura crítica.                      \\ \bottomrule
+\end{tabular}%
+}
+\caption{Breve análisis de costo implementativo}
+\label{table:technical-cost}
+\end{table}
 
 \newpage
 
