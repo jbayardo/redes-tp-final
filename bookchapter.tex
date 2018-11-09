@@ -401,7 +401,9 @@ Finalmente, se adapta al emisor para poder decodificar la secuencia de ACKs en u
 
 Los autores realizaron una gran cantidad de experimentos sobre un \textit{data center} productivo, con aplicaciones reales, y encontraron resultados muy positivos: una disminución drástica de la cantidad de paquetes encolados, mejoras sustanciales en la latencia de las respuestas y, por supuesto, la eliminación de Incast.
 
-Cabe destacar, sin embargo, que no hacen referencia sobre cómo impacta DCTCP en las conexiones hacia clientes fuera del \textit{data center}, y que el uso productivo del protocolo requiere \textit{switches} con ECN.
+Cabe destacar, sin embargo, que no hacen referencia sobre cómo impacta DCTCP en las conexiones hacia clientes fuera del \textit{data center}, y que el uso productivo del protocolo requiere \textit{switches} con ECN. Es además una critica conocida que no logra convivir bien con nodos que no utilizan DCTCP en el mismo \textit{data center} \cite{Judd_Promise_2015}.
+
+DCTCP ha sido la solución más utilizada en la práctica. Como testimonio, pueden encontrarse múltiples trabajos que lo analizan e intentan mejorar su \textit{performance} de una forma u otra, en más de un caso basándose en experiencia práctica con el protocolo \cite{Alizadeh_DCTCP_Analysis_2011} \cite{Vamanan_D2TCP_2012} \cite{Munir_L2DCT_2013} \cite{Judd_Promise_2015} \cite{Sreekumari_NewDCTCP_2016}.
 
 \paragraph{ICTCP}
 
@@ -545,9 +547,6 @@ Este esquema tiene el beneficio de ser extremadamente simple, de bajo costo, y r
 % TODO: 2017 https://dl.acm.org/citation.cfm?id=3138199
 % TODO: https://dl.acm.org/citation.cfm?id=2330777
 
-% DCTCP Variant: https://dl.acm.org/citation.cfm?id=2884658
-% DCTCP Analysis: https://dl.acm.org/citation.cfm?id=2007125
-
 % TCP-CWR: https://dl.acm.org/citation.cfm?id=2950680
 
 % Initiation, Continuation, Termination: https://www.researchgate.net/publication/254463026_Preventing_TCP_incast_throughput_collapse_at_the_initiation_continuation_and_termination
@@ -555,22 +554,45 @@ Este esquema tiene el beneficio de ser extremadamente simple, de bajo costo, y r
 % TODO: Application-Level Sharing https://dl.acm.org/citation.cfm?id=3087559
 % TODO: Application-Levle Tokens https://dl.acm.org/citation.cfm?id=2901336
 
-% TODO: Named Data Networking http://sci-hub.tw/https://dl.acm.org/citation.cfm?doid=3226052.3226055
-% TODO: + NDN https://dl.acm.org/citation.cfm?id=3226055
-
 \newpage
 
 \section{Seguridad}
 
-Tal vez una de las menciones más notoriamente ausente en la literatura de Incast hasta ahora citada en este trabajo, es cómo afecta Incast a la seguridad en los \textit{data centers}. Este tema no ha sido muy estudiado de por sí, y hay muy poco trabajo publicado.
+Tal vez una de las menciones más notoriamente ausente en la literatura hasta ahora citada en este trabajo, es cómo afecta a la seguridad en los \textit{data centers}. Este tema no ha sido muy estudiado de por sí, y hay muy poco trabajo publicado.
 
-\citet{}
+\citet{Jain_Inside_2015} proponen un caso en el cual un atacante pondría múltiples máquinas en el mismo \textit{rack} que el receptor siendo atacado. Entonces, las máquinas comprometidas harían envío de datos hacia la víctima, generando Incast y causando una degradación de servicio. Lo proponen como un \textit{convert attack}, porque a priori sería muy difícil de distinguir el tráfico como maligno (al parecerse a un \textit{workload} estereotípico de MapReduce), e incluso así sería difícil distinguir las máquinas legítimas de las comprometidas.
+
+\citet{Zhenqian_EPVDCN_2010} proponen un ataque donde se generan múltiples conexiones sincronizadas hacia un servidor víctima; estas conexiones tienen el objetivo de forzar la pérdida de paquetes de un \textit{switch} intermedio que funciona como cuello de botella, y luego de perder la mayor cantidad de paquetes posibles para que la caída del \textit{throughput} sea lo más fuerte posible. La técnica es claramente muy similar a un escenario de Incast, por lo que sería muy difícil de distinguir el tráfico maligno del benigno. La experimentación es muy breve y deja muchas preguntas abiertas, pero la línea de pensamiento parece que podría lograr resultados interesantes.
+
+En \cite{Zhenqian_Shrew_2011}, los mismos autores del artículo anterior proponen un nuevo ataque, donde esta vez el objetivo ya no es un servidor individual, sino la red entera. A este fin, el atacante controla múltiples máquinas dentro del \textit{data center}, preferentemente en lugares distantes dentro de la topología de la red; qué tan distantes estén va a determinar la eficacia del ataque. El proceso se estructura en dos etapas: durante la primera, se utilizan subconjuntos de dos máquinas para medir el tamaño esperado del \textit{buffer} disponible; durante la segunda, se aplica el mismo ataque de \cite{Zhenqian_EPVDCN_2010}, pero hacia una máquina que es controlada por el atacante. De esta forma, se fuerza a que los cuellos de botella intermedios pierdan paquetes. La experimentación en este caso es un poco más extensa que en el anterior, pero también abre más preguntas de las que cierra.
+
+Los autores de los tres artículos mencionados utilizaron Windows Server como plataforma de experimentación, que por defecto tiene un $\text{RTO}_{\text{min}}$ de $300 ms$, ampliamente mayor que el valor por defecto en Linux, y por supuesto mucho mayor que el RTT en un \textit{data center}. Además, cabe destacar que en todos los casos, el vector de ataque son los \textit{timeouts}, y hacen fuertes suposiciones de que $\text{RTO}_{\text{min}}$ es mucho mayor al RTT, por lo que reducir $\text{RTO}_{\text{min}}$ podría mitigar estos ataques.
+
+En una nota más personal, da la sensación de haber amplia oportunidad para experimentar en este terreno. Los ataques expuestos anteriormente, tienen oportunidades de mejora y experimentación que podría ser más amplia. Fuera de eso, hay un par de ideas simples que no parecen haber sido probadas:
+
+\begin{itemize}
+    \item Muchos servicios, como los buscadores web, tienen arquitecturas que los vuelven propensos a Incast, un ataque plausible sería generar pedidos que lleven hacia una caída de \textit{throughput}, como forma de degradar el servicio.
+    
+    \item Los ataques anteriores utilizan problemas con \textit{timeouts}, pero no hay mención al \textit{unfairness}. Podría generarse intentando armar una situación artificial de TCP Outcast, donde controlando múltiples máquinas en un data center podríamos generar flujos que lleven a Port Blackout.
+    
+    \item Un \textit{data center} que tenga DCTCP como solución para Incast está abierto a problemas un \textit{unfairness} inherentemente; si generamos que crezca el \textit{buffer} de un \textit{switch} cuello de botella, un receptor que corra DCTCP va a forzar la caída de la ventana de congestión del emisor en el otro lado de la conexión. Por ende, una par de maquinas atacantes que no hagan caso a los mensajes de congestión podrían generar una caida de \textit{goodput}. Algo similar sucede con ICTCP.
+\end{itemize}
 
 \newpage
 
 \section{Ruteo}
 
-\newpage
+Una pregunta interesante a hacerse es: ¿será posible evitar un \textit{switch} que está siendo un cuello de botella para Incast a través de ajustar las tablas de ruteo de los otros \textit{switches}?. Las únicas referencias a este tipo de ideas fueron encontradas en el contexto de Software Defined Networking (SDN).
+
+\citet{Yifei_SDNCont_2015} proponen un algoritmo que identifica conexiones que están produciendo Incast activamente en los \textit{switches} intermedios, y genera dinámicamente reglas en los \textit{switches} para ajustar la ventana del host receptor, a fines de  disminuir la cantidad de datos enviados por esos flujos, así descongestionando la red.
+
+\citet{Abdelmoniem_SICC_2018} proponen un algoritmo que intenta predecir qué flujos van a causar Incast, para entonces enviar un mensaje al hipervisor del receptor, que se encargará de modificar los paquetes de salida para que la ventana de recepción ajuste el \textit{throughput} de la conexión, evitando Incast.
+
+\citet{Gholami_ReRoute_SDN_2015} proponen medir activamente el tamaño de las colas en los \textit{switches} de la red virtualizada, cambiando las tablas de ruteo de los mismos en tiempo real para utilizar los caminos más cortos no congestionados. Sin embargo, sus resultados son todos a través de simulaciones.
+
+\citet{Hafeez_SDN_2018} realizaron un excelente relevamiento de múltiples formas de atacar Incast en este área. Cabe destacar que este tipo de soluciones en general no intentan únicamente atacar Incast, sino que además tratan de optimizar otras variables como tiempo de completitud.
+
+Fuera del área de SDN, no parecería haber soluciones que intenten resolver Incast con este tipo de aproximación al problema. Sin embargo, hay que tener en cuenta que probablemente sea difícil lograr un buen protocolo para este tipo de cambios en tiempo real: el tráfico que caracteriza a Incast es \textit{bursty}, \textit{short-lived}, y altamente paralelo, lo cual requeriría de un algoritmo que logre detectar y realizar los cambios muy rápidamente -y probablemente en una situación de congestión- para que sea útil.
 
 \section{Conclusión} \label{conclusion}
 
@@ -583,6 +605,14 @@ TCP Incast es uno de los principales causantes de problemas de \textit{throughpu
 En este trabajo realizamos un paneo de la literatura sobre TCP Incast en los últimos años; además, resumimos múltiples formas de atacar al problema, desde las capas de Aplicación, Transporte, y Enlace, mostrando una amplia variedad de soluciones con distintas complejidades de implementación y resultados prácticos.
 
 Se prepararon varias tablas para resumir los resultados de este trabajo. En la tabla \ref{table:layer-classification} puede verse una división por las capas del modelo OSI de cada una de las soluciones presentadas. Cabe destacar que en muchos casos las técnicas no están enteramente contenidas dentro de una capa (por ejemplo, DCTCP requiere cambios en la capa de transporte, y cambios en la capa de enlace); esta clasificación es por lo tanto ambigua, y a criterio del autor. En las tablas \ref{table:technical-feasibility} y \ref{table:technical-cost}, presentamos un breve juicio de factibilidad técnica y posible costo implementativo de cada una de las propuestas, con un criterio similar al utilizado en \cite{Ren_A_2014}.
+
+Hay múltiples resultados y formas de atacar el problema de Incast que no fueron cubiertas, fundamentalmente para limitar la amplitud de la búsqueda. A continuación se mencionan algunas de ellas, junto con citas para los lectores con interés en continuar profundizando en el tema.
+
+Sólo mirando soluciones de capa de transporte, \citet{Sreekumari_Transport_2016} cubren más de 16 protocolos basados en TCP que intentan resolver el problema; algunos de los cuales fueron mencionados en este trabajo.
+
+Hay también soluciones, como \cite{Jiang_CodingBased_2012} que proponen cambios más extremos, como reemplazar TCP con una variante de UDP más un mecanismo para asegurarse \textit{reliability}, y otro para hacer control de congestión; sin embargo, el diseño es preliminar y claramente muy impráctico como para ser utilizado en la vida real.
+
+En una nota aun más radical, Named Data Networking (NDN) \cite{Zhang_NDN_2014} es un nuevo paradigma que nace a partir de intentar reemplazar IP; donde la idea es que los recursos tengan nombres útiles para los usuarios. En este contexto, también han comenzado a aparecer nuevas formas de atacar Incast \cite{Zhou_CCM_2018}. 
 
 \newpage
 
