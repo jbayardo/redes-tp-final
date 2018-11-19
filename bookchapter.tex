@@ -12,8 +12,8 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 
-% Necesario para imágenes
-\usepackage{graphicx}
+% Necesario para imágenes. NOTA: YA SE CARGA EN LA CARATULA
+% \usepackage{graphicx}
 
 % Necesario para URLs
 \usepackage{url}
@@ -61,16 +61,26 @@
  
 \lstset{style=default_style}
 
+\usepackage{caratula/caratula}
+
 \begin{document}
 
-\mainmatter
+% \mainmatter
 
 \title{Sondeo del estado del arte en TCP Incast}
 \author{Julián Bayardo}
 \institute{Universidad de Buenos Aires\\
 \url{julian@bayardo.info}}
 
+\titulo{Sondeo del estado del arte en TCP Incast}
+\fecha{14 de Noviembre del 2018}
+\materia{Teoría de las Comunicaciones}
+
+\integrante{Julián Bayardo}{850/13}{julian@bayardo.info}
+
 \maketitle
+
+\newpage
 
 \tableofcontents
 
@@ -707,6 +717,7 @@ Hashed Credits Fair \cite{Shpiner_HCF_2010}                    & Muy Alto. Cambi
 
 \newpage
 
+\addcontentsline{toc}{section}{Bibliografía}
 \bibliography{readcube_export}{}
 
 \end{document}
